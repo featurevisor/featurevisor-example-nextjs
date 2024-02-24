@@ -1,6 +1,6 @@
 import Image from "next/image";
-import styles from "./page.module.css";
-import { getInstance } from "./featurevisor";
+import styles from "../page.module.css";
+import { getInstance } from "../../featurevisor";
 
 export default async function Home() {
   const featureKey = "my_feature";
@@ -15,7 +15,7 @@ export default async function Home() {
       <div className={styles.description}>
         <p>
           Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
+          <code className={styles.code}>app/approuter/page.tsx</code>
         </p>
         <div>
           <a

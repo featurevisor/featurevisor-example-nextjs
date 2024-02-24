@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 
-import { getInstance } from "../featurevisor";
+import { getInstance } from "../../featurevisor";
 
 const inter = Inter({ subsets: ["latin"] });
 
