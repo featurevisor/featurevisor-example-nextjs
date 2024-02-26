@@ -22,6 +22,12 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+### App Router Example
+
+We have added an example of an app router in the `app` directory. This example demonstrates how to set up and use routing in your application. You can use this as a reference for setting up your own routes.
+
+To verify the functionality of the app router example, open your web browser and navigate to [http://localhost:3001/approuter](http://localhost:3001/approuter). This will allow you to interact with the example and see the routing in action.
+
 ## Learn More
 
 To learn more about Featurevisor, visit:
