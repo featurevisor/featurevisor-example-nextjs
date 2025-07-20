@@ -1,14 +1,9 @@
 import Image from "next/image";
 
-import { getInstance } from "@/featurevisor";
+import { exampleFlag } from "@/flags";
 
 export default async function Home() {
-  const f = await getInstance();
-
-  const featureKey = "baz";
-  const context = { userId: "123" };
-
-  const isFeatureEnabled = f.isEnabled(featureKey, context);
+  const isFeatureEnabled = await exampleFlag();
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -22,9 +17,7 @@ export default async function Home() {
           priority
         />
 
-        <p>
-          Feature {featureKey} is: {isFeatureEnabled ? "enabled" : "disabled"}
-        </p>
+        <p>Feature is: {isFeatureEnabled ? "enabled" : "disabled"}</p>
 
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2 tracking-[-.01em]">
