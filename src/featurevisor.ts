@@ -7,6 +7,11 @@ export interface FeaturevisorAdapterOptions {
   f?: FeaturevisorInstance;
 }
 
+export interface FeaturevisorEntitiesType {
+  userId?: string;
+  // ...more properties for your context can be added here
+}
+
 export function createFeaturevisorAdapter(options: FeaturevisorAdapterOptions) {
   const f = options.f || createInstance({});
   let initialFetchCompleted = false;
@@ -36,10 +41,10 @@ export function createFeaturevisorAdapter(options: FeaturevisorAdapterOptions) {
   }
 
   // adapter
-  return function featurevisorAdapter<ValueType, EntitiesType>(): Adapter<
+  return function featurevisorAdapter<
     ValueType,
-    EntitiesType
-  > {
+    EntitiesType extends FeaturevisorEntitiesType
+  >(): Adapter<ValueType, EntitiesType> {
     return {
       async decide({ key, entities, headers, cookies }): Promise<ValueType> {
         // ensure the datafile is fetched before making decisions
@@ -48,10 +53,10 @@ export function createFeaturevisorAdapter(options: FeaturevisorAdapterOptions) {
         }
 
         const context = {
-          // userId: entities?.userId,
+          userId: entities?.userId,
         };
 
-        // mapping passed key to Featurevisor SDk methods:
+        // mapping passed key to Featurevisor SDK methods:
         //
         //   - "<featureKey>"               => f.isEnabled(key, context)
         //   - "<featureKey>:variation"     => f.getVariation(key, context)
@@ -59,8 +64,8 @@ export function createFeaturevisorAdapter(options: FeaturevisorAdapterOptions) {
         const [featureKey, variableKey] = key.split(":");
 
         if (variableKey) {
-          // variation
           if (variableKey === "variation") {
+            // variation
             return f.getVariation(featureKey, context) as ValueType;
           } else {
             // variable
