@@ -1,10 +1,10 @@
 import type { Adapter } from "flags";
-import { createInstance, FeaturevisorInstance } from "@featurevisor/sdk";
+import { createFeaturevisor, type Featurevisor } from "@featurevisor/sdk";
 
 export interface FeaturevisorAdapterOptions {
   datafileUrl: string;
   refreshInterval?: number;
-  f?: FeaturevisorInstance;
+  instance?: Featurevisor;
 }
 
 export interface FeaturevisorEntitiesType {
@@ -13,24 +13,38 @@ export interface FeaturevisorEntitiesType {
 }
 
 export function createFeaturevisorAdapter(options: FeaturevisorAdapterOptions) {
-  const f = options.f || createInstance({});
+  const f = options.instance ?? createFeaturevisor();
   let initialFetchCompleted = false;
+  let pendingFetch: Promise<void> | undefined;
 
   // datafile fetcher
   function fetchAndSetDatafile() {
+    if (pendingFetch) {
+      return pendingFetch;
+    }
+
     console.log("[Featurevisor] Fetching datafile from:", options.datafileUrl);
 
-    const result = fetch(options.datafileUrl)
-      .then((response) => response.json())
+    pendingFetch = fetch(options.datafileUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        return response.json();
+      })
       .then((datafile) => {
-        f.setDatafile(datafile);
+        f.setDatafile(datafile, true);
         initialFetchCompleted = true;
       })
       .catch((error) =>
         console.error("[Featurevisor] Error fetching datafile:", error)
-      );
+      )
+      .finally(() => {
+        pendingFetch = undefined;
+      });
 
-    return result;
+    return pendingFetch;
   }
 
   // datafile refresher (periodic update)
@@ -46,7 +60,7 @@ export function createFeaturevisorAdapter(options: FeaturevisorAdapterOptions) {
     EntitiesType extends FeaturevisorEntitiesType
   >(): Adapter<ValueType, EntitiesType> {
     return {
-      async decide({ key, entities, headers, cookies }): Promise<ValueType> {
+      async decide({ key, entities }): Promise<ValueType> {
         // ensure the datafile is fetched before making decisions
         if (!initialFetchCompleted) {
           await fetchAndSetDatafile();
@@ -56,7 +70,7 @@ export function createFeaturevisorAdapter(options: FeaturevisorAdapterOptions) {
           userId: entities?.userId,
         };
 
-        // mapping passed key to Featurevisor SDK methods:
+        // Map the passed key to Featurevisor SDK methods:
         //
         //   - "<featureKey>"               => f.isEnabled(key, context)
         //   - "<featureKey>:variation"     => f.getVariation(key, context)

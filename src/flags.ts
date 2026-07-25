@@ -5,7 +5,7 @@ const featurevisorAdapter = createFeaturevisorAdapter({
   datafileUrl:
     "https://featurevisor-example-cloudflare.pages.dev/production/featurevisor-tag-all.json",
   refreshInterval: 5 * 60 * 1000, // 5 minutes
-  // f: existingFeaturevisorInstance, // pass an existing Featurevisor SDK instance if any
+  // instance: existingInstance,
 });
 
 export const myFeatureFlag = flag({
