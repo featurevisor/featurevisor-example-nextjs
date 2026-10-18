@@ -34,7 +34,10 @@ export function createFeaturevisorAdapter(options: FeaturevisorAdapterOptions) {
         return response.json();
       })
       .then((datafile) => {
-        f.setDatafile(datafile, true);
+        if (!f.setDatafile(datafile, true)) {
+          throw new Error("Datafile was rejected");
+        }
+
         initialFetchCompleted = true;
       })
       .catch((error) =>
